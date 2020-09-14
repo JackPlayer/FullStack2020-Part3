@@ -26,6 +26,14 @@ let persons = [
         number: "345-999"
     },
 ]
+
+app.use(express.json())
+
+
+const generateId = () => {
+    return Math.floor(Math.random() * 10000)
+}
+
 // Info Page
 app.get('/info', (request, response) =>{
     const date = new Date()
@@ -64,6 +72,28 @@ app.delete('/api/persons/:id', (request, response) => {
 
     response.status(204).end()
 
+})
+
+// Add entry
+app.post('/api/persons', (request, response) => {
+
+    const body = request.body
+
+    if(!body.number || !body.name) {
+        return response.status(400).json({
+            error: 'content missing'
+        })
+    }
+
+    const newEntry = {
+        id: generateId(),
+        date: new Date(),
+        name: body.name,
+        number: body.number
+    }
+
+    persons = persons.concat(newEntry)
+    response.json(newEntry)
 })
 
 const PORT = 3001
