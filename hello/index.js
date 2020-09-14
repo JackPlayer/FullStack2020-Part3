@@ -55,7 +55,7 @@ app.get('/api/notes', (req, res) => {
 // Delete a note
 app.delete('/api/notes/:id', (request, response) => {
     const id = request.params.id
-    const note = notes.filter((note) => note.id !== parseInt(id))
+    notes = notes.filter((note) => note.id !== parseInt(id))
 
     response.status(204).end()
 })
