@@ -26,6 +26,17 @@ let persons = [
         number: "345-999"
     },
 ]
+// Info Page
+app.get('/info', (request, response) =>{
+    const date = new Date()
+    const info = 
+        `
+        <p>Phonebook has info for ${persons.length} people</p>
+        <p>${date}</p>
+        `
+    response.send(info)
+})
+
 
 // Get full collection
 app.get('/api/persons', (request, response) => {
