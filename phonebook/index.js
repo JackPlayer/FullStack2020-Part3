@@ -1,5 +1,6 @@
 const express = require('express')
 const morgan = require('morgan')
+const cors = require('cors')
 const app = express()
 
 let persons = [
@@ -29,6 +30,7 @@ let persons = [
 ]
 
 app.use(express.json())
+app.use(cors())
 app.use(morgan((tokens, req, res) => {
     const data = (tokens.method(req, res) === "POST") ? JSON.stringify(req.body) : ''
     return [
