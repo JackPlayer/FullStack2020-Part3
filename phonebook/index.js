@@ -31,6 +31,7 @@ let persons = [
 
 app.use(express.json())
 app.use(cors())
+app.use(express.static('build'))
 app.use(morgan((tokens, req, res) => {
     const data = (tokens.method(req, res) === "POST") ? JSON.stringify(req.body) : ''
     return [
@@ -120,6 +121,24 @@ app.post('/api/persons', (request, response) => {
 
     persons = persons.concat(newEntry)
     response.json(newEntry)
+})
+
+// Update entry
+app.put(('/api/persons/:id'), (request, response) => {
+    console.log("Put request")
+    const id = Number(request.params.id)
+    const person = persons.find((e) => e.id == id)
+
+    if (!person || !request.body || !request.body.number) {
+        response.status(400).end()
+    }
+    const updatedEntry = {
+        ...person,
+        number: request.body.number
+    }
+
+    persons = persons.map((person) => person.id === id ? updatedEntry : person)
+    response.json(updatedEntry)
 })
 
 const PORT = process.env.PORT || 3001
