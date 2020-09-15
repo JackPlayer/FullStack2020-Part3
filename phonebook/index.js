@@ -60,6 +60,11 @@ app.get('/info', (request, response) =>{
     response.send(info)
 })
 
+// README Page
+app.get('/readme', (request, response) => {
+    response.sendFile('./README.md', { root: __dirname})
+
+})
 
 // Get full collection
 app.get('/api/persons', (request, response) => {
