@@ -40,7 +40,6 @@ if (newName && newNumber) {
     console.log('phonebook')
     result.forEach((e) => console.log(`${e.name} ${e.number}`))
     mongoose.connection.close()
-
   })
 
 }

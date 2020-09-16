@@ -1,34 +1,10 @@
+require('dotenv').config()
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
 const app = express()
+const Person = require('./models/person')
 
-
-let persons = [
-    {
-        id: 1, 
-        name: "Arto Hellas",
-        number: "040-123456"
-    },
-
-    {
-        id: 3, 
-        name: "Jack Player",
-        number: "250-555-5555"
-    },
-
-    {
-        id: 2, 
-        name: "CM Punk",
-        number: "654-999-5555"
-    },
-
-    {
-        id: 4, 
-        name: "Bill Clinton",
-        number: "345-999"
-    },
-]
 
 app.use(express.json())
 app.use(cors())
@@ -46,10 +22,9 @@ app.use(morgan((tokens, req, res) => {
     ].join(' ')
 }))
 
+const persons = [
 
-const generateId = () => {
-    return Math.floor(Math.random() * 10000)
-}
+]
 
 // Info Page
 app.get('/info', (request, response) =>{
@@ -70,19 +45,19 @@ app.get('/readme', (request, response) => {
 
 // Get full collection
 app.get('/api/persons', (request, response) => {
-    response.json(persons)
+    Person.find({}).then((persons) => {
+        response.json(persons)
+    })
+    
 })
 
 // Get individual resource
 app.get('/api/persons/:id', (request, response) => {
     const id = request.params.id
-    const person = persons.find((p) => p.id === parseInt(id))
     
-    if(person) {
+    Person.findById(id).then((person) => {
         response.json(person)
-    } else {
-        response.status(404).end()
-    }
+    })
 
 })
 
@@ -113,15 +88,16 @@ app.post('/api/persons', (request, response) => {
         })
     }
 
-    const newEntry = {
-        id: generateId(),
+    const newEntry = new Person({
         date: new Date(),
         name: body.name,
         number: body.number
-    }
+    })
 
-    persons = persons.concat(newEntry)
-    response.json(newEntry)
+    newEntry.save().then(savedPerson => {
+        response.json(savedPerson)
+    })
+    
 })
 
 // Update entry
@@ -142,7 +118,7 @@ app.put(('/api/persons/:id'), (request, response) => {
     response.json(updatedEntry)
 })
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
