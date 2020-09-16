@@ -2,7 +2,6 @@ const mongoose = require('mongoose')
 require('dotenv').config({path: '../.env'})
 
 const url = process.env.MONGO
-console.log(url)
 
 mongoose.connect(url, {useNewUrlParser: true, useUnifiedTopology: true})
     .then((response) => {
