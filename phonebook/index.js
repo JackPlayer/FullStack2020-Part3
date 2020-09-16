@@ -91,18 +91,6 @@ app.post('/api/persons', (request, response, next) => {
 
     const body = request.body
 
-    if(!body.number || !body.name) {
-        return response.status(400).json({
-            error: 'name or number are missing from content'
-        })
-    }
-
-    if (persons.find((e) => e.name === body.name)) {
-        return response.status(400).json({
-            error: 'the name must be unique'
-        })
-    }
-
     const newEntry = new Person({
         date: new Date(),
         name: body.name,
@@ -110,7 +98,7 @@ app.post('/api/persons', (request, response, next) => {
     })
 
     newEntry.save().then(savedPerson => {
-        response.json(savedPerson)
+        response.json(savedPerson.toJSON())
     })
     .catch(error => next(error))
     
@@ -143,9 +131,10 @@ const errorHandler = (error, request, response, next) => {
 
     if(error.name === 'CastError') {
         return response.status(400).send({error: 'malformatted id'})
+    }else if (error.name === 'ValidationError') {
+        return response.status(400).json({ error: error.message })
     }
     next(error)
-   
 }
 
 app.use(unknownEndpoint)
