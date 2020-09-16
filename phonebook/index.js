@@ -4,6 +4,7 @@ const morgan = require('morgan')
 const cors = require('cors')
 const app = express()
 const Person = require('./models/person')
+const { response } = require('express')
 
 
 app.use(express.json())
@@ -29,13 +30,22 @@ const persons = [
 // Info Page
 app.get('/info', (request, response) =>{
     const date = new Date()
-    const info = 
-        `
-        <p>Phonebook has info for ${persons.length} people</p>
-        <p>${date}</p>
-        `
-    response.send(info)
-})
+    let info = '<p>No info available</p>'
+    Person
+        .find({})
+        .then((persons) => {
+            info = 
+            `
+            <p>Phonebook has info for ${persons.length} people</p>
+            <p>${date}</p>
+            `
+            response.send(info)
+        })
+        .catch((error) => {
+            console.error(error)
+            response.send(info)
+        })
+    })
 
 // README Page
 app.get('/readme', (request, response) => {
@@ -53,7 +63,7 @@ app.get('/api/persons', (request, response) => {
 })
 
 // Get individual resource
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
     const id = request.params.id
     
     Person.findById(id).then((person) => {
@@ -65,6 +75,7 @@ app.get('/api/persons/:id', (request, response) => {
 
 // Delete entry
 app.delete('/api/persons/:id', (request, response, next) => {
+    console.log("Requested")
     Person.findByIdAndRemove(request.params.id)
         .then((result) => {
             response.status(204).end()
@@ -76,7 +87,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
 })
 
 // Add entry
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
 
     const body = request.body
 
@@ -106,21 +117,20 @@ app.post('/api/persons', (request, response) => {
 })
 
 // Update entry
-app.put(('/api/persons/:id'), (request, response) => {
-    console.log("Put request")
-    const id = Number(request.params.id)
-    const person = persons.find((e) => e.id == id)
+app.put(('/api/persons/:id'), (request, response, next) => {
+    const body = request.body
 
-    if (!person || !request.body || !request.body.number) {
-        response.status(400).end()
-    }
-    const updatedEntry = {
-        ...person,
-        number: request.body.number
+    const person = {
+        name: body.name,
+        number: body.number
     }
 
-    persons = persons.map((person) => person.id === id ? updatedEntry : person)
-    response.json(updatedEntry)
+    
+    Person.findByIdAndUpdate(request.params.id, person, {new: true})
+        .then((updatedPerson) => {
+            response.json(updatedPerson)
+        })
+        .catch(error => next(error))
 })
 
 
