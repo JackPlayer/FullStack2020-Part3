@@ -4,8 +4,6 @@ const morgan = require('morgan')
 const cors = require('cors')
 const app = express()
 const Person = require('./models/person')
-const { response } = require('express')
-
 
 app.use(express.json())
 app.use(cors())
@@ -114,7 +112,7 @@ app.put(('/api/persons/:id'), (request, response, next) => {
     }
 
     
-    Person.findByIdAndUpdate(request.params.id, person, {new: true})
+    Person.findByIdAndUpdate(request.params.id, person, {new: true, runValidators: true})
         .then((updatedPerson) => {
             response.json(updatedPerson)
         })
